@@ -1,5 +1,9 @@
 package kg.geektech.weathergeektech.di;
 
+import android.content.Context;
+
+import androidx.room.Room;
+
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Singleton;
@@ -7,6 +11,7 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import dagger.hilt.InstallIn;
+import dagger.hilt.android.qualifiers.ApplicationContext;
 import dagger.hilt.components.SingletonComponent;
 
 import kg.geektech.weathergeektech.data.remote.WeatherApi;
@@ -48,11 +53,22 @@ public abstract class AppModule {
 
     @Provides
     @Singleton
-    public static MainRepositories provideMainRepository(WeatherApi api){
-        return new MainRepositories(api);
+    public static MainRepositories provideMainRepository(WeatherApi api,WeatherDao dao){
+        return new MainRepositories(api,dao);
     }
+
     @Provides
     public static WeatherDao provideDao(WeatherDataBase database) {
         return database.weatherDao();
     }
+
+    @Provides
+    public static WeatherDataBase provideDataBase(@ApplicationContext Context context){
+         return Room.databaseBuilder(context,
+                WeatherDataBase.class, "WeatherDataBase")
+                 .allowMainThreadQueries()
+                 .build();
+    }
+
+
 }

@@ -6,7 +6,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import kg.geektech.weathergeektech.common.Resource;
+import kg.geektech.weathergeektech.common.RequestState;
 import kg.geektech.weathergeektech.data.models.MainResponse;
 import kg.geektech.weathergeektech.data.remote.WeatherApi;
 import kg.geektech.weathergeektech.room.WeatherDao;
@@ -18,35 +18,32 @@ public class MainRepositories {
     private WeatherApi api;
     private WeatherDao dao;
 
+    @Inject
     public MainRepositories(WeatherApi api, WeatherDao dao) {
         this.api = api;
         this.dao = dao;
     }
 
-    @Inject
-    public MainRepositories(WeatherApi api) {
-        this.api = api;
-    }
 
-    public MutableLiveData<Resource<MainResponse>> getWeather(String city) {
-        MutableLiveData<Resource<MainResponse>> liveData = new MutableLiveData<>();
-        liveData.setValue(Resource.loading());
+    public MutableLiveData<RequestState<MainResponse>> getWeather(String city) {
+        MutableLiveData<RequestState<MainResponse>> liveData = new MutableLiveData<>();
+        liveData.setValue(RequestState.loading());
         api.getApi(city, "89ac1f837c318c7a142986110e0b9c02", "metric").enqueue(new Callback<MainResponse>() {
             @Override
             public void onResponse(Call<MainResponse> call, Response<MainResponse> response) {
 
                 if (response.isSuccessful() && response.body() != null) {
-                    liveData.setValue(Resource.success(response.body()));
-                    //dao.insertAll(response.body());
+                    liveData.setValue(RequestState.success(response.body()));
+                    dao.insertAll(response.body());
                 } else {
-                    liveData.setValue(Resource.error(response.message(), null));
+                    liveData.setValue(RequestState.error(response.message(), null));
 
                 }
             }
 
             @Override
             public void onFailure(Call<MainResponse> call, Throwable t) {
-                liveData.setValue(Resource.error(t.getLocalizedMessage(), null));
+                liveData.setValue(RequestState.error(t.getLocalizedMessage(), null));
             }
         });
         return liveData;

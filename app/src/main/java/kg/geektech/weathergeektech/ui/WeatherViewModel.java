@@ -8,7 +8,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import dagger.hilt.android.lifecycle.HiltViewModel;
-import kg.geektech.weathergeektech.common.Resource;
+import kg.geektech.weathergeektech.common.RequestState;
 import kg.geektech.weathergeektech.data.models.MainResponse;
 import kg.geektech.weathergeektech.data.repositories.MainRepositories;
 
@@ -16,7 +16,7 @@ import kg.geektech.weathergeektech.data.repositories.MainRepositories;
 public class WeatherViewModel extends ViewModel {
 
     public MainRepositories repository;
-    public LiveData<Resource<MainResponse>> liveData;
+    public LiveData<RequestState<MainResponse>> liveData;
 
     @Inject
     public WeatherViewModel(MainRepositories repository) {
